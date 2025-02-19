@@ -12,11 +12,11 @@ class SteelPricePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('스틸가'),
         actions: [
-          TopDropDownButton(codeMaster: CODE_MASTER.firstWhere((e) => e.code == 'maker')),
+          TopDropDownButton(codeMaster: codeMaster.firstWhere((e) => e.code == 'maker')),
           SizedBox(width: 10),
-          TopDropDownButton(codeMaster: CODE_MASTER.firstWhere((e) => e.code == 'product')),
+          TopDropDownButton(codeMaster: codeMaster.firstWhere((e) => e.code == 'product')),
           SizedBox(width: 10),
-          TopDropDownButton(codeMaster: CODE_MASTER.firstWhere((e) => e.code == 'country')),
+          TopDropDownButton(codeMaster: codeMaster.firstWhere((e) => e.code == 'country')),
         ],
       ),
       body: Padding(

@@ -13,7 +13,7 @@ class CodeDetail {
   CodeDetail(this.code, this.title);
 }
 
-final CODE_MASTER = [
+final codeMaster = [
   CodeMaster(
     'maker',
     '메이커',

@@ -20,16 +20,16 @@ class _SteelPriceGridState extends ConsumerState<SteelPriceGrid> {
   late PlutoGridStateManager stateManager;
 
   final List<PlutoColumn> columns = <PlutoColumn>[
-    PlutoColumn(
-      title: 'CUSTOMER',
-      field: 'customer',
-      type: PlutoColumnType.text(),
-    ),
-    PlutoColumn(
-      title: 'PORT',
-      field: 'port',
-      type: PlutoColumnType.text(),
-    ),
+    // PlutoColumn(
+    //   title: 'CUSTOMER',
+    //   field: 'customer',
+    //   type: PlutoColumnType.text(),
+    // ),
+    // PlutoColumn(
+    //   title: 'PORT',
+    //   field: 'port',
+    //   type: PlutoColumnType.text(),
+    // ),
     PlutoColumn(
       title: 'ITEM',
       field: 'item',
@@ -60,14 +60,14 @@ class _SteelPriceGridState extends ConsumerState<SteelPriceGrid> {
       type: PlutoColumnType.number(),
       readOnly: true,
       renderer: (rendererContext) {
-        final _row = rendererContext.row;
+        final row = rendererContext.row;
 
         return Tooltip(
           richMessage: WidgetSpan(
               child: BaseSizeExtra(
-            item: _row.cells['item']!.value.toString(),
-            thickness: int.parse(_row.cells['thickness']!.value.toString()),
-            witdh: int.parse(_row.cells['width']!.value.toString()),
+            item: row.cells['item']!.value.toString(),
+            thickness: double.parse(row.cells['thickness']!.value.toString()),
+            witdh: double.parse(row.cells['width']!.value.toString()),
           )),
           child: Text(rendererContext.cell.value.toString()),
         );
@@ -129,24 +129,24 @@ class _SteelPriceGridState extends ConsumerState<SteelPriceGrid> {
       columns: columns,
       rows: rows,
       columnGroups: columnGroups,
-      onLoaded: (PlutoGridOnLoadedEvent event) {
-        stateManager = event.stateManager;
-      },
-      onChanged: (PlutoGridOnChangedEvent event) {
-        if (event.column.field == 'item') {
-          final String selectedItem = event.value;
-          final List<String> newSpecOptions = specOptions[selectedItem] ?? [];
+      // onLoaded: (PlutoGridOnLoadedEvent event) {
+      //   stateManager = event.stateManager;
+      // },
+      // onChanged: (PlutoGridOnChangedEvent event) {
+      //   if (event.column.field == 'item') {
+      //     final String selectedItem = event.value;
+      //     final List<String> newSpecOptions = specOptions[selectedItem] ?? [];
 
-          final specColumn = stateManager.columns.firstWhere((column) => column.field == 'spec');
-          specColumn.type = PlutoColumnType.select(newSpecOptions);
+      //     final specColumn = stateManager.columns.firstWhere((column) => column.field == 'spec');
+      //     specColumn.type = PlutoColumnType.select(newSpecOptions);
 
-          if (!newSpecOptions.contains(event.row.cells['spec']?.value)) {
-            event.row.cells['spec']?.value = '';
-          }
+      //     if (!newSpecOptions.contains(event.row.cells['spec']?.value)) {
+      //       event.row.cells['spec']?.value = '';
+      //     }
 
-          stateManager.notifyListeners();
-        }
-      },
+      //     stateManager.notifyListeners();
+      //   }
+      // },
       configuration: const PlutoGridConfiguration(),
     );
   }

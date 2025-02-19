@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class BaseSizeExtra extends StatelessWidget {
   const BaseSizeExtra({
@@ -9,8 +10,8 @@ class BaseSizeExtra extends StatelessWidget {
   });
 
   final String item;
-  final int thickness;
-  final int witdh;
+  final double thickness;
+  final double witdh;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,10 @@ class BaseSizeExtra extends StatelessWidget {
         ThicknessBase(minBase: 800, maxBase: 1199, weight: 3),
         ThicknessBase(minBase: 1200, maxBase: 1549, weight: 2),
         ThicknessBase(minBase: 1550, maxBase: 1849, weight: 1),
-      ]
+      ],
+      'CGI': [
+        CGIThicknessBase(minBase: 0, maxBase: 0, weight: 0),
+      ],
     };
     final weightBaseList = {
       'CR': [
@@ -57,7 +61,15 @@ class BaseSizeExtra extends StatelessWidget {
         WeightBase(minBase: 1.991, maxBase: 2.540, weight: 0),
         WeightBase(minBase: 2.541, maxBase: 4.000, weight: -1),
         WeightBase(minBase: 4.001, maxBase: 6.000, weight: -2),
-      ]
+      ],
+      'CGI': [
+        CGIWeightBase(minBase: 700, maxBase: 761, weight: 2),
+        CGIWeightBase(minBase: 762, maxBase: 913, weight: 1),
+        CGIWeightBase(minBase: 914, maxBase: 1219, weight: 0),
+        CGIWeightBase(minBase: 1220, maxBase: 1250, weight: 1),
+        CGIWeightBase(minBase: 1251, maxBase: 1524, weight: 2),
+        CGIWeightBase(minBase: 1525, maxBase: 2000, weight: 3),
+      ],
     };
 
     return Column(
@@ -67,14 +79,13 @@ class BaseSizeExtra extends StatelessWidget {
           decoration: BoxDecoration(color: Colors.white),
           border: TableBorder.all(),
           dataTextStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
-          headingTextStyle:
-              TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
-          dataRowMaxHeight: 50,
+          headingTextStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
           horizontalMargin: 10,
+          columnSpacing: 10,
+          dataRowMinHeight: 10,
           columns: [
-            DataColumn(label: Text('T / W')),
-            ...thicknessBaseList[item]!
-                .map((e) => DataColumn(label: Text(e.title))),
+            DataColumn(label: Align(child: Text('T / W'))),
+            ...thicknessBaseList[item]!.map((e) => DataColumn(label: Text(e.title))),
           ],
           rows: weightBaseList[item]!
               .map((row) => DataRow(cells: [
@@ -84,7 +95,7 @@ class BaseSizeExtra extends StatelessWidget {
                       if (extraPrice < 1) {
                         extraPrice = row.weight.abs() + e.weight;
                       }
-                      return DataCell(Text(extraPrice.toString()));
+                      return DataCell(Align(child: Text(extraPrice.toString())));
                     })
                   ]))
               .toList(),
@@ -110,6 +121,17 @@ class ThicknessBase {
   }
 }
 
+class CGIThicknessBase extends ThicknessBase {
+  CGIThicknessBase({
+    required super.minBase,
+    required super.maxBase,
+    required super.weight,
+  });
+
+  @override
+  String get title => 'Extra';
+}
+
 class WeightBase {
   final double minBase;
   final double maxBase;
@@ -122,6 +144,48 @@ class WeightBase {
   });
 
   String get title {
+    final f = NumberFormat('0.000');
+    return '${f.format(minBase)}~${f.format(maxBase)}';
+  }
+}
+
+class CGIWeightBase extends WeightBase {
+  CGIWeightBase({
+    required super.minBase,
+    required super.maxBase,
+    required super.weight,
+  });
+
+  @override
+  String get title {
     return '$minBase~$maxBase';
   }
+}
+
+void main(List<String> args) {
+  runApp(
+    MaterialApp(
+      home: SingleChildScrollView(
+        child: Column(
+          children: [
+            BaseSizeExtra(
+              item: 'PO',
+              thickness: 100,
+              witdh: 100,
+            ),
+            BaseSizeExtra(
+              item: 'CR',
+              thickness: 100,
+              witdh: 100,
+            ),
+            BaseSizeExtra(
+              item: 'CGI',
+              thickness: 100,
+              witdh: 100,
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
