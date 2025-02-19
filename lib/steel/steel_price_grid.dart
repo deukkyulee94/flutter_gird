@@ -11,6 +11,14 @@ class SteelPriceGrid extends ConsumerStatefulWidget {
 }
 
 class _SteelPriceGridState extends ConsumerState<SteelPriceGrid> {
+  final Map<String, List<String>> specOptions = {
+    'PO': ['PO SPHC', 'PO SS400'],
+    'CR': ['CR3 SPCD', 'CR3 SPCC'],
+    'CGI': ['EN-DX51D+Z', 'SGCC'],
+  };
+
+  late PlutoGridStateManager stateManager;
+
   final List<PlutoColumn> columns = <PlutoColumn>[
     PlutoColumn(
       title: 'CUSTOMER',
@@ -34,14 +42,12 @@ class _SteelPriceGridState extends ConsumerState<SteelPriceGrid> {
     PlutoColumn(
       title: 'SPEC',
       field: 'spec',
-      type: PlutoColumnType.select([
-        'CR3 SPCD',
-      ]),
+      type: PlutoColumnType.select([]),
     ),
     PlutoColumn(
       title: 'THICKNESS',
       field: 'thickness',
-      type: PlutoColumnType.number(),
+      type: PlutoColumnType.number(format: '0.00'),
     ),
     PlutoColumn(
       title: 'WIDTH',
@@ -49,7 +55,7 @@ class _SteelPriceGridState extends ConsumerState<SteelPriceGrid> {
       type: PlutoColumnType.number(),
     ),
     PlutoColumn(
-      title: 'SIZE' + String.fromCharCode(0x10) + 'EXTRA',
+      title: 'SIZE EXTRA',
       field: 'size_extra',
       type: PlutoColumnType.number(),
       readOnly: true,
@@ -75,31 +81,71 @@ class _SteelPriceGridState extends ConsumerState<SteelPriceGrid> {
 
   @override
   Widget build(BuildContext context) {
+    final emptyJson = {
+      'customer': '',
+      'port': '',
+      'item': '',
+      'spec': '',
+      'thickness': 0,
+      'width': 0,
+      'size_extra': 0,
+    };
+    final rowJson = [
+      {
+        'customer': 'Best Steel',
+        'port': 'Osaka',
+        'item': 'CR',
+        'spec': 'CR3 SPCD',
+        'thickness': 0.40,
+        'width': 1000,
+        'size_extra': 0,
+      },
+      {
+        'customer': 'Best Steel',
+        'port': 'Osaka',
+        'item': 'CR',
+        'spec': 'CR3 SPCD',
+        'thickness': 0.45,
+        'width': 900,
+        'size_extra': 0,
+      },
+      {
+        'customer': 'Best Steel',
+        'port': 'Osaka',
+        'item': 'CGI',
+        'spec': 'EN-DX51D+Z',
+        'thickness': 0.45,
+        'width': 1072,
+        'size_extra': 6,
+      },
+    ];
     final List<PlutoRow> rows = [
-      PlutoRow(
-        cells: {
-          'customer': PlutoCell(value: ''),
-          'port': PlutoCell(value: ''),
-          'item': PlutoCell(value: 'CR'),
-          'spec': PlutoCell(value: 'CR3 SPCD'),
-          'thickness': PlutoCell(value: 300),
-          'width': PlutoCell(value: 300),
-          'size_extra': PlutoCell(value: 100),
-          // 'joined': PlutoCell(value: '2021-01-01'),
-          // 'working_time': PlutoCell(value: '09:00'),
-        },
-      ),
+      ...rowJson.map((e) => PlutoRow.fromJson(e)),
+      PlutoRow.fromJson(emptyJson),
+      PlutoRow.fromJson(emptyJson),
+      PlutoRow.fromJson(emptyJson),
     ];
     return PlutoGrid(
       columns: columns,
       rows: rows,
       columnGroups: columnGroups,
-      // onLoaded: (PlutoGridOnLoadedEvent event) {
-      //   stateManager = event.stateManager;
-      //   stateManager.setShowColumnFilter(true);
-      // },
+      onLoaded: (PlutoGridOnLoadedEvent event) {
+        stateManager = event.stateManager;
+      },
       onChanged: (PlutoGridOnChangedEvent event) {
-        print(event);
+        if (event.column.field == 'item') {
+          final String selectedItem = event.value;
+          final List<String> newSpecOptions = specOptions[selectedItem] ?? [];
+
+          final specColumn = stateManager.columns.firstWhere((column) => column.field == 'spec');
+          specColumn.type = PlutoColumnType.select(newSpecOptions);
+
+          if (!newSpecOptions.contains(event.row.cells['spec']?.value)) {
+            event.row.cells['spec']?.value = '';
+          }
+
+          stateManager.notifyListeners();
+        }
       },
       configuration: const PlutoGridConfiguration(),
     );
